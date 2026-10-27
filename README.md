@@ -1,5 +1,5 @@
 ## BYC E-Commerce Backend
-A RESTful API backend for the BYC online store, built with Node.js, Express, and MongoDB. It powers product browsing, customer management, cart operations, order processing with Paystack payment integration, user authentication, and a blog system.
+A RESTful API backend for the BYC online store, built with Node.js, Express, and MongoDB. It powers product browsing, customer management, cart operations, order processing with Paystack payment integration, user authentication.
 
 ## Table of Contents
 - Features
@@ -13,7 +13,7 @@ A RESTful API backend for the BYC online store, built with Node.js, Express, and
 ## Features
 
 - JWT-based user authentication with admin role support
-- Full CRUD operations for products, categories, blogs, customers, carts, and orders
+- Full CRUD operations for products, categories, customers, carts, and orders
 - Paystack payment gateway integration
 - Request validation using Joi on all input
 - Password hashing with bcrypt
@@ -48,8 +48,7 @@ byc-ecommerce-backend/
 │   ├── category.js                     # Product category model
 │   ├── product.js                      # Product model (embeds category)
 │   ├── cart.js                         # Shopping cart model
-│   ├── order.js                        # Order model with Paystack fields
-│   └── blog.js                         # Blog post model
+│   └── order.js                        # Order model with Paystack fields
 ├── routes/                             # Route handlers 
 │   ├── auth.js
 │   ├── users.js
@@ -57,8 +56,7 @@ byc-ecommerce-backend/
 │   ├── products.js
 │   ├── customers.js
 │   ├── carts.js
-│   ├── orders.js
-│   └── blogs.js
+│   └── orders.js
 ├── index.js                            # App entry point
 ├── package.json
 └── .gitignore
@@ -92,12 +90,6 @@ POST - /order/create        # Place a new order
 PUT - order/update-delivery-status/:id
 PUT - order/update-payment-status/:id
 
-# Blogs
-GET - /blog/get-all-blogs       # Get all blog posts
-GET - /blog//get-single-blog/:id       # Get a single blog post
-POST - /blog/add-new-blog           # Create a blog post
-PUT - /blog/update-blog/:id         # Update a blog post
-DELETE - /blog/delete-blog/:id      # Delete a blog post
 ## Getting Started
 
 Node.js v18 or higher
