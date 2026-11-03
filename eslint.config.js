@@ -26,8 +26,8 @@ module.exports = [
     },
     rules: {
       // Express error handlers must declare all 4 arguments, even when `next` isn't used.
-      'no-unused-vars': ['error', { argsIgnorePattern: '^next$' }],
-      // Pino is the logger (coding-standards.md section 7).
+      'no-unused-vars': ['error', { argsIgnorePattern: '^next$', ignoreRestSiblings: true }],
+      // Pino is the logger 
       'no-console': 'error',
     },
   },

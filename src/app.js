@@ -9,6 +9,7 @@ const errorHandler = require('./middleware/errorHandler');
 const {sendSuccess} = require('./utils/sendResponse')
 const authRoutes = require('./modules/auth/auth.routes');
 const usersRoutes = require('./modules/users/users.routes');
+const categoriesRoutes = require('./modules/categories/categories.routes');
 
 const API_PREFIX = '/api/solenne/v1';
 const HEALTH_PATH = `${API_PREFIX}/health`;
@@ -17,7 +18,7 @@ const corsOptions = {
   // No Origin header means a non-browser caller (Postman, Paystack webhook): allow it.
   origin: (origin, callback) => callback(null, !origin || env.allowedOrigins.includes(origin)),
   methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Idempotency-Key'],
+  allowedHeaders: ['Content-Type', 'Idempotency-Key'],
   exposedHeaders: ['Retry-After'],
   credentials: true,
 };
@@ -47,7 +48,7 @@ app.use(express.json({ limit: JSON_BODY_LIMIT }));
 
 app.use(`${API_PREFIX}/auth`, noStore, authRoutes);
 app.use(`${API_PREFIX}/users`, noStore, usersRoutes);
-
+app.use(`${API_PREFIX}/categories`, noStore, categoriesRoutes);
 app.use(notFound);
 app.use(errorHandler);
 

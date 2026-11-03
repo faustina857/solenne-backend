@@ -24,8 +24,7 @@ const buildAuthResponse = (user) => ({ user: toPublicUser(user), token: signToke
 
 const hashCode = (purpose, code) => crypto.createHmac('sha256',env.jwt.secret).update(`${purpose}:${code}`).digest('hex');
 
-// The raw token goes in the email; only its SHA-256 hash is stored, so a leaked database
-// can't be used to verify or reset anyone's account.
+// Creates a new code and its hashed record, but does not save it. The code is sent to the user.
 const createCode = (purpose) => {
   const code = String(crypto.randomInt(10**CODE_LENGTH)).padStart(CODE_LENGTH, '0');
   const record = {

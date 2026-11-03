@@ -41,6 +41,7 @@ const addressSchema = new mongoose.Schema(
         type: Boolean, 
         default: false 
     },
+    fingerprint:{ type: String }
   },
   { timestamps: true },
 );
@@ -100,7 +101,6 @@ const userSchema = new mongoose.Schema(
         type: codeSchema, 
         select: false
     },
-    passwordResetExpires: Date,
     addresses: [addressSchema],
   },
   { timestamps: true },

@@ -24,13 +24,14 @@ const ERRORS = defineErrors([
   ],
   ['USER_NOT_FOUND', 404, "We couldn't find that user."],
   ['ADDRESS_NOT_FOUND', 404, "We couldn't find that address."],
+  ['ADDRESS_EXISTS', 409, "You've already saved this address."],
   ['ADDRESS_LIMIT_REACHED', 409, 'You can save up to 10 addresses. Please remove one before adding another.'],
   ['PRODUCT_NOT_FOUND', 404, "We couldn't find that product. It may have been removed."],
   ['ORDER_NOT_FOUND', 404, "We couldn't find that order."],
   ['NOT_FOUND', 404, "We couldn't find what you're looking for."],
   ['ROUTE_NOT_FOUND', 404, "That page or action doesn't exist."],
   ['EMAIL_EXISTS', 409, 'An account with this email already exists. Try logging in instead.'],
-  ['CONFLICT', 409, 'That already exists. Please use a different value.'],
+  ['CONFLICT', 409, 'Already exists. Please use a different value.'],
   ['OUT_OF_STOCK', 409, 'Sorry, that item just sold out.'],
   ['INSUFFICIENT_STOCK', 409, "There isn't enough stock for that quantity."],
   ['CART_HAS_ISSUES', 409, 'Some items in your cart changed. Please review them.'],
@@ -89,7 +90,8 @@ const VALIDATION_MESSAGES = Object.freeze({
   'string.min': 'This is too short. Use at least {#limit} characters.',
   'string.max': 'This is too long. Use at most {#limit} characters.',
   'string.pattern.base': "This isn't in the right format.",
-  'string.uri': 'Enter a valid code.',
+  'string.uri': 'Enter a valid web address.',
+  'string.uriCustomScheme': 'Enter a valid web address starting with https://',
   'number.base': 'Enter a valid number.',
   'number.integer': 'Enter a whole number.',
   'number.min': 'This must be at least {#limit}.',
@@ -101,6 +103,7 @@ const VALIDATION_MESSAGES = Object.freeze({
   'array.max': 'You can add at most {#limit} items.',
   'date.base': 'Enter a valid date.',
   'object.base': "We couldn't read that request. Please try again.",
+  'object.min': 'Send at least one field to update.',
   'objectId.invalid': "That selection isn't valid.",
 });
 const MESSAGES = Object.freeze({
@@ -118,5 +121,10 @@ const MESSAGES = Object.freeze({
   PHONE_INVALID: 'Enter a valid Nigerian phone number, like 08012345678.',
   STATE_INVALID: 'Choose a valid Nigerian state.',
   LETTERS_ONLY: 'Use letters, spaces, hyphens or apostrophes only.',
+  CATEGORY_NAME_INVALID: "Use letters, numbers, spaces, & . ' or - only, starting with a letter or number.",
+  PARENT_INVALID: 'Choose a main category as the parent.',
+  CATEGORY_DEACTIVATED: 'Category deactivated.',
+  CATEGORY_HAS_PRODUCTS: (count) =>
+    `This category still has ${count} ${count === 1 ? 'product' : 'products'}. Move or deactivate them first.`,
 });
 module.exports = { ERRORS, EMPTY, VALIDATION_MESSAGES, MESSAGES };

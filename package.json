@@ -7,7 +7,8 @@
     "start": "node src/index.js",
     "dev": "node --watch src/index.js",
     "lint": "eslint .",
-    "seed:admin": "node src/seed/seedAdmin.js"
+    "seed:admin": "node src/seed/seedAdmin.js",
+    "seed:categories": "node src/seed/seedCategories.js"
   },
   "keywords": [],
   "author": "",
@@ -22,7 +23,8 @@
     "joi": "^18.0.1",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.20.0",
-    "pino": "^10.4.0"
+    "pino": "^10.4.0",
+    "slugify": "^1.6.9"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
