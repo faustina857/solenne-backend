@@ -1,7 +1,7 @@
 const { rateLimit } = require('express-rate-limit');
 const AppError = require('../utils/appError');
 const { ERRORS } = require('../utils/messages');
-const { GLOBAL_RATE_LIMIT } = require('../constants');
+const GLOBAL_RATE_LIMIT = Object.freeze({ windowMs: 60 * 1000, limit: 100 });
 
 const createRateLimiter = ({ windowMs, limit, keyGenerator }) =>
   rateLimit({

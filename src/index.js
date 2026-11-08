@@ -1,8 +1,8 @@
 const env = require('./config/env');
 const logger = require('./config/logger');
 const { connectDb, disconnectDb } = require('./config/db');
-const { SHUTDOWN_TIMEOUT_MS } = require('./constants');
 const app = require('./app');
+const SHUTDOWN_TIMEOUT_MS = 10 * 1000;
 
 // After one of these the process state can't be trusted. Log and exit; the host restarts it.
 const crash = (label) => (err) => {

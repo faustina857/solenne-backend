@@ -2,7 +2,6 @@ const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
 const env = require('./config/env');
-const { JSON_BODY_LIMIT } = require('./constants');
 const { globalLimiter } = require('./middleware/rateLimit');
 const notFound = require('./middleware/notFound');
 const errorHandler = require('./middleware/errorHandler');
@@ -10,7 +9,9 @@ const {sendSuccess} = require('./utils/sendResponse')
 const authRoutes = require('./modules/auth/auth.routes');
 const usersRoutes = require('./modules/users/users.routes');
 const categoriesRoutes = require('./modules/categories/categories.routes');
+const productsRoutes = require('./modules/products/products.routes');
 
+const JSON_BODY_LIMIT = '100kb';
 const API_PREFIX = '/api/solenne/v1';
 const HEALTH_PATH = `${API_PREFIX}/health`;
 
@@ -49,6 +50,7 @@ app.use(express.json({ limit: JSON_BODY_LIMIT }));
 app.use(`${API_PREFIX}/auth`, noStore, authRoutes);
 app.use(`${API_PREFIX}/users`, noStore, usersRoutes);
 app.use(`${API_PREFIX}/categories`, noStore, categoriesRoutes);
+app.use(`${API_PREFIX}/products`, noStore, productsRoutes);
 app.use(notFound);
 app.use(errorHandler);
 

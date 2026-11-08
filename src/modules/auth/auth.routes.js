@@ -3,11 +3,12 @@ const { ipKeyGenerator } = require('express-rate-limit');
 const { validate } = require('../../middleware/validate');
 const { authenticate } = require('../../middleware/auth');
 const { createRateLimiter } = require('../../middleware/rateLimit');
-const { AUTH_RATE_LIMIT, CODE_REQUEST_RATE_LIMIT } = require('../../constants');
 const controller = require('./auth.controller');
 const schemas = require('./auth.validation');
 
 const router = express.Router();
+const AUTH_RATE_LIMIT = Object.freeze({ windowMs: 15 * 60 * 1000, limit: 10 });
+const CODE_REQUEST_RATE_LIMIT = Object.freeze({ windowMs: 60 * 60 * 1000, limit: 5 });
 
 // Each route gets its own limiter, so they count separately (10 per 15 minutes each).
 const createAuthLimiter = () => createRateLimiter(AUTH_RATE_LIMIT);

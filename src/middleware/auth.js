@@ -4,13 +4,10 @@ const { verifyToken, readAuthCookie } = require('../utils/jwt');
 const { findAuthUser } = require('../modules/users/users.service');
 const { MS_PER_SECOND } = require('../constants');
 
-
 // Loads the user from the database on every request, so deactivation, role changes
 // and password changes take effect immediately (the token only proves who you are).
-const authenticate = async (req, res, next) => {
-  const token = readAuthCookie(req) ;
-  if (!token) throw AppError.fromCode(ERRORS.UNAUTHENTICATED);
-
+// Throws when the token is bad or the account can't be used. Shared by both middlewares below.
+const loadUser = async (token) => {
   const payload = verifyToken(token);
   const user = await findAuthUser(payload.sub);
   if (!user) throw AppError.fromCode(ERRORS.UNAUTHENTICATED);
@@ -22,7 +19,29 @@ const authenticate = async (req, res, next) => {
     : 0;
   if (payload.iat < changedAt) throw AppError.fromCode(ERRORS.SESSION_EXPIRED);
 
-  req.user = user;
+  return user;
+};
+
+const authenticate = async (req, res, next) => {
+  const token = readAuthCookie(req);
+  if (!token) throw AppError.fromCode(ERRORS.UNAUTHENTICATED);
+
+  req.user = await loadUser(token);
+  next();
+};
+
+// For public routes whose result can differ for admins (e.g. includeInactive on GET /products).
+// A missing, expired or invalid cookie means "guest", never a 401, so a stale cookie can't
+// break browsing. If the database is down the route's own query fails with a proper 500 next.
+const optionalAuthenticate = async (req, res, next) => {
+  const token = readAuthCookie(req);
+  if (token) {
+    try {
+      req.user = await loadUser(token);
+    } catch {
+      // Treated as a guest.
+    }
+  }
   next();
 };
 
@@ -35,4 +54,4 @@ const requireRole =
     next();
   };
 
-module.exports = { authenticate, requireRole };
+module.exports = { authenticate, optionalAuthenticate, requireRole };

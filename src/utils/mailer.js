@@ -1,15 +1,14 @@
 const env = require('../config/env');
 const logger = require('../config/logger');
-const {
-  EMAIL_SEND_ATTEMPTS,
-  EMAIL_RETRY_DELAY_MS,
-  EMAIL_REQUEST_TIMEOUT_MS,
-  CODE_TTL_MINUTES,
-} = require('../constants');
+const { CODE_TTL_MINUTES} = require('../constants');
 
 const BREVO_SEND_URL = 'https://api.brevo.com/v3/smtp/email';
 const HTTP_TOO_MANY_REQUESTS = 429;
 const HTTP_SERVER_ERROR = 500;
+const EMAIL_REQUEST_TIMEOUT_MS = 10000
+const EMAIL_SEND_ATTEMPTS = 3;
+const EMAIL_RETRY_DELAY_MS = 1000;
+
 
 const HTML_ESCAPES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
 

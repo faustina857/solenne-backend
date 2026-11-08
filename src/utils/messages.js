@@ -25,7 +25,11 @@ const ERRORS = defineErrors([
   ['USER_NOT_FOUND', 404, "We couldn't find that user."],
   ['ADDRESS_NOT_FOUND', 404, "We couldn't find that address."],
   ['ADDRESS_EXISTS', 409, "You've already saved this address."],
-  ['ADDRESS_LIMIT_REACHED', 409, 'You can save up to 10 addresses. Please remove one before adding another.'],
+  [
+    'ADDRESS_LIMIT_REACHED',
+    409,
+    'You can save up to 10 addresses. Please remove one before adding another.',
+  ],
   ['PRODUCT_NOT_FOUND', 404, "We couldn't find that product. It may have been removed."],
   ['ORDER_NOT_FOUND', 404, "We couldn't find that order."],
   ['NOT_FOUND', 404, "We couldn't find what you're looking for."],
@@ -104,8 +108,10 @@ const VALIDATION_MESSAGES = Object.freeze({
   'date.base': 'Enter a valid date.',
   'object.base': "We couldn't read that request. Please try again.",
   'object.min': 'Send at least one field to update.',
+  'object.and': 'Send the category and the sub-category together.',
   'objectId.invalid': "That selection isn't valid.",
 });
+
 const MESSAGES = Object.freeze({
   CODE_FORMAT: 'Enter the 6-digit code from your email.',
   LOGGED_OUT: 'You have been logged out.',
@@ -121,10 +127,26 @@ const MESSAGES = Object.freeze({
   PHONE_INVALID: 'Enter a valid Nigerian phone number, like 08012345678.',
   STATE_INVALID: 'Choose a valid Nigerian state.',
   LETTERS_ONLY: 'Use letters, spaces, hyphens or apostrophes only.',
-  CATEGORY_NAME_INVALID: "Use letters, numbers, spaces, & . ' or - only, starting with a letter or number.",
+  CATEGORY_NAME_INVALID:
+    "Use letters, numbers, spaces, & . ' or - only, starting with a letter or number.",
   PARENT_INVALID: 'Choose a main category as the parent.',
   CATEGORY_DEACTIVATED: 'Category deactivated.',
   CATEGORY_HAS_PRODUCTS: (count) =>
     `This category still has ${count} ${count === 1 ? 'product' : 'products'}. Move or deactivate them first.`,
+  PRODUCT_DEACTIVATED: 'Product deactivated.',
+  PRODUCT_NAME_INVALID: 'The product name needs at least one letter or number.',
+  PRODUCT_NAME_TAKEN: 'A product with this name already exists. Please use a different name.',
+  SKU_TAKEN: 'One of these SKUs is already used by another product. Each SKU must be unique.',
+  SKU_INVALID: 'Use capital letters, numbers, hyphens or underscores only.',
+  SIZE_INVALID: 'Use letters, numbers, spaces, dots, slashes or hyphens only.',
+  COLOR_INVALID: 'Use letters, spaces or hyphens only.',
+  BRAND_INVALID: "Use letters, numbers, spaces, & ' . , + or - only, starting with a letter or number.",
+  PRODUCT_CATEGORY_INVALID: 'Choose a main category.',
+  PRODUCT_SUBCATEGORY_INVALID: 'Choose a sub-category that belongs to the selected category.',
+  COMPARE_PRICE_INVALID: 'The original price must be higher than the selling price.',
+  VARIANTS_DUPLICATE:
+    'Each SKU, and each size and color combination, can only be used once per product.',
+  VARIANT_NOT_FOUND: "We couldn't find that product or variant.",
 });
+
 module.exports = { ERRORS, EMPTY, VALIDATION_MESSAGES, MESSAGES };

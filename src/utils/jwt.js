@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const env = require('../config/env');
-const { AUTH_COOKIE_NAME, MS_PER_SECOND } = require('../constants');
+const { MS_PER_SECOND } = require('../constants');
+const AUTH_COOKIE_NAME = 'solenne_token';
 
 // Pinning the algorithm stops a forged token from choosing a weaker one.
 const ALGORITHM = 'HS256';

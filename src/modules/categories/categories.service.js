@@ -1,41 +1,57 @@
 const slugify = require('slugify');
 const Category = require('./category.model');
+const Product = require('../products/product.model');
 const AppError = require('../../utils/appError');
 const { ERRORS, MESSAGES } = require('../../utils/messages');
 
-const toSlug = (name) => slugify(name, {lower: true, strict: true, trim: true});
+const toSlug = (name) => slugify(name, { lower: true, strict: true, trim: true });
 
-const fieldError = (field, message) => AppError.fromCode(
-    ERRORS.VALIDATION_ERROR, undefined, {errors: [{ field, message }] }
-);
+// A 400 VALIDATION_ERROR pointing at one field. Also used by the products service.
+const fieldError = (field, message) =>
+  AppError.fromCode(ERRORS.VALIDATION_ERROR, undefined, { errors: [{ field, message }] });
 
-const getProductCounts = async () => ({});
+// Active products per category id, in one aggregation. Each product counts once for its
+// main category and once for its sub-category: $project makes a two-item array of both ids,
+// $unwind turns it into two rows, and $group counts the rows per id.
+const getProductCounts = async () => {
+  const counts = await Product.aggregate([
+    { $match: { isActive: true } },
+    { $project: { _id: 0, ids: ['$category', '$subCategory'] } },
+    { $unwind: '$ids' },
+    { $group: { _id: '$ids', count: { $sum: 1 } } },
+  ]);
+  return Object.fromEntries(counts.map(({ _id, count }) => [_id.toString(), count]));
+};
 
+// Only one category is checked here, so count its products directly instead of counting all.
 const assertHasNoProducts = async (id) => {
-    const productCounts = await getProductCounts();
-    const count = productCounts[id] ?? 0;
-    if (count === 0) return;
-    throw AppError.fromCode(ERRORS.CATEGORY_NOT_EMPTY, MESSAGES.CATEGORY_HAS_PRODUCTS(count));
+  const count = await Product.countDocuments({
+    isActive: true,
+    $or: [{ category: id }, { subCategory: id }],
+  });
+  if (count === 0) return;
+  throw AppError.fromCode(ERRORS.CATEGORY_NOT_EMPTY, MESSAGES.CATEGORY_HAS_PRODUCTS(count));
 };
 
 const getCategoryTree = async () => {
-    const [categories, productCounts] = await Promise.all([
-        Category.find({isActive:true}).sort({ sortOrder: 1, name:1, _id:1 }).lean(),
-        getProductCounts()
-    ]);
-    const addCount = (category) => ({ 
-        ...category, 
-        productCount: productCounts[category._id.toString()] ?? 0 
-    });
-    const mainCategories = categories.filter((category) => !category.parent);
+  const [categories, productCounts] = await Promise.all([
+    Category.find({ isActive: true }).sort({ sortOrder: 1, name: 1, _id: 1 }).lean(),
+    getProductCounts(),
+  ]);
+  const addCount = (category) => ({
+    ...category,
+    productCount: productCounts[category._id.toString()] ?? 0,
+  });
+  const mainCategories = categories.filter((category) => !category.parent);
 
-    return mainCategories.map((main) => ({
-        ...addCount(main),
-        subCategories: categories
-            .filter((category) => category.parent?.equals(main._id))
-            .map(addCount)
-    }));
+  return mainCategories.map((main) => ({
+    ...addCount(main),
+    subCategories: categories
+      .filter((category) => category.parent?.equals(main._id))
+      .map(addCount),
+  }));
 };
+
 const createCategory = async ({ name, parent = null, image = null, sortOrder = 0 }) => {
   if (parent) {
     // Only a main category (one with no parent of its own) can be a parent: two levels only.
@@ -64,4 +80,4 @@ const updateCategory = async (id, changes) => {
   return category;
 };
 
-module.exports = { getCategoryTree, createCategory, updateCategory, toSlug };
+module.exports = { getCategoryTree, createCategory, updateCategory, toSlug, fieldError };

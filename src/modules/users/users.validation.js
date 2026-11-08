@@ -1,7 +1,8 @@
 const Joi = require('joi');
 const { objectId } = require('../../middleware/validate');
 const { MESSAGES } = require('../../utils/messages');
-const { NIGERIAN_STATES, NIGERIAN_PHONE_REGEX } = require('../../constants');
+const { NIGERIAN_STATES} = require('../../constants');
+const NIGERIAN_PHONE_REGEX = /^(\+234|0)[789][01]\d{8}$/;
 
 const NAME_MIN_LENGTH = 2;
 const NAME_MAX_LENGTH = 80;

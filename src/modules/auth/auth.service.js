@@ -7,14 +7,13 @@ const AppError = require('../../utils/appError');
 const { ERRORS, MESSAGES } = require('../../utils/messages');
 const { signToken } = require('../../utils/jwt');
 const mailer = require('../../utils/mailer');
-const {
-  BCRYPT_COST,
-  CODE_LENGTH,
-  CODE_TTL_MS,
-  CODE_MAX_ATTEMPTS,
-  CODE_PURPOSES,
-} = require('../../constants');
-
+const { BCRYPT_COST, CODE_LENGTH, CODE_TTL_MS} = require('../../constants');
+const CODE_MAX_ATTEMPTS = 5;
+// These values are the names of the User fields that hold each kind of code.
+const CODE_PURPOSES = Object.freeze({
+  EMAIL_VERIFICATION: 'emailVerification',
+  PASSWORD_RESET: 'passwordReset',
+});
 // A dummy hash is used to make the timing of a failed login attempt
 //  independent of whether the email exists.
 const DUMMY_HASH = bcrypt.hashSync('placeholder-never-matches', BCRYPT_COST);
