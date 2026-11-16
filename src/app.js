@@ -10,6 +10,7 @@ const authRoutes = require('./modules/auth/auth.routes');
 const usersRoutes = require('./modules/users/users.routes');
 const categoriesRoutes = require('./modules/categories/categories.routes');
 const productsRoutes = require('./modules/products/products.routes');
+const deliveryRoutes = require('./modules/delivery/delivery.routes')
 
 const JSON_BODY_LIMIT = '100kb';
 const API_PREFIX = '/api/solenne/v1';
@@ -51,6 +52,7 @@ app.use(`${API_PREFIX}/auth`, noStore, authRoutes);
 app.use(`${API_PREFIX}/users`, noStore, usersRoutes);
 app.use(`${API_PREFIX}/categories`, noStore, categoriesRoutes);
 app.use(`${API_PREFIX}/products`, noStore, productsRoutes);
+app.use(`${API_PREFIX}/delivery`, noStore, deliveryRoutes)
 app.use(notFound);
 app.use(errorHandler);
 

@@ -4,11 +4,12 @@ const AppError = require('../../utils/appError');
 const { serialize } = require('../../utils/sendResponse');
 const { ERRORS } = require('../../utils/messages');
 const { MAX_ADDRESSES } = require('../../constants');
+const { normalize, addDeliveryStatus, requireDeliveryArea} = require('../delivery/delivery.service')
 
 const AUTH_USER_FIELDS = 'name email phone role emailVerified isActive passwordChangedAt createdAt';
 // The address fields that decide "same place". Changing any of them changes the fingerprint.
 const LOCATION_FIELDS = ['street', 'city', 'state'];
-
+const AREA_FIELDS = ['state', 'city']
 // The only shape of a user the API ever returns (never password or token hashes).
 const toPublicUser = ({ _id, name, email, phone, role, emailVerified, createdAt }) => ({
   _id,
@@ -42,7 +43,6 @@ const toObjectId = (id) => new mongoose.Types.ObjectId(id);
 
 // Same place = same street, city and state, ignoring case and extra spaces.
 // JSON.stringify keeps the three parts separate, so no mix of them can look like another.
-const normalize = (value) => value.trim().toLowerCase().replace(/\s+/g, ' ');
 const toFingerprint = ({ street, city, state }) =>
   JSON.stringify([street, city, state].map(normalize));
 
@@ -60,6 +60,12 @@ const findOneAddress = async (userId, match) => {
 const findAddress = async (userId, addressId) => {
   const address = await findOneAddress(userId, { _id: addressId });
   if (!address) throw AppError.fromCode(ERRORS.ADDRESS_NOT_FOUND);
+  return address;
+};
+
+// The address the API returns also says whether we deliver there (step 5).
+const findAddressWithDelivery = async (userId, addressId) => {
+  const [address] = await addDeliveryStatus([await findAddress(userId, addressId)]);
   return address;
 };
 
@@ -86,12 +92,16 @@ const listAddresses = async (userId) => {
   const user = await User.findById(userId).select('addresses').lean();
   if (!user) throw AppError.fromCode(ERRORS.USER_NOT_FOUND);
   // .lean() skips schema defaults, so a user saved without the field has no array.
-  return (user.addresses ?? []).map(toPublicAddress);
+  return addDeliveryStatus((user.addresses ?? []).map(toPublicAddress));
 };
 
 const createAddress = async (userId, fields) => {
+  // The city must be one the admin listed. It is saved with the admin's spelling.
+  const zone = await requireDeliveryArea(fields);
+  const address = { ...fields, state: zone.state, city: zone.city };
+
   const addressId = new mongoose.Types.ObjectId();
-  const fingerprint = toFingerprint(fields);
+  const fingerprint = toFingerprint(address);
   // One atomic update checks both rules and pushes: fewer than the maximum addresses, and
   // none with this fingerprint. Two parallel requests can't exceed the cap or save twins.
   const { matchedCount } = await User.updateOne(
@@ -100,13 +110,13 @@ const createAddress = async (userId, fields) => {
       'addresses.fingerprint': { $ne: fingerprint },
       $expr: { $lt: [{ $size: { $ifNull: ['$addresses', []] } }, MAX_ADDRESSES] },
     },
-    { $push: { addresses: { _id: addressId, ...fields, fingerprint } } },
+    { $push: { addresses: { _id: addressId, ...address, fingerprint } } },
   );
   if (matchedCount === 0) {
     await throwExistingOr(userId, { fingerprint }, ERRORS.ADDRESS_LIMIT_REACHED);
   }
   if (fields.isDefault) await clearOtherDefaults(userId, addressId);
-  return findAddress(userId, addressId);
+  return findAddressWithDelivery(userId, addressId);
 };
 
 const updateAddress = async (userId, addressIdParam, fields) => {
@@ -116,12 +126,21 @@ const updateAddress = async (userId, addressIdParam, fields) => {
 
   const changes = { ...fields };
   const filter = { _id: userId, 'addresses._id': addressId };
+
+  // Only when the state or city changes must the new pair be a listed city. Editing just the
+  // street of an old address never fails because its city was removed from the zones later.
+  if (AREA_FIELDS.some((key) => key in fields)) {
+    const zone = await requireDeliveryArea({ ...current, ...fields });
+    changes.state = zone.state;
+    changes.city = zone.city;
+  }
+
   const isLocationChange = LOCATION_FIELDS.some((key) => key in fields);
 
   // The fingerprint is rebuilt only when the place changes. The filter then refuses
   // the update if a DIFFERENT address of this user already has the same fingerprint.
   if (isLocationChange) {
-    changes.fingerprint = toFingerprint({ ...current, ...fields });
+    changes.fingerprint = toFingerprint({ ...current, ...changes});
     filter.addresses = {
       $not: { $elemMatch: { fingerprint: changes.fingerprint, _id: { $ne: addressId } } },
     };
@@ -147,7 +166,7 @@ const updateAddress = async (userId, addressIdParam, fields) => {
     );
   }
   if (fields.isDefault) await clearOtherDefaults(userId, addressId);
-  return findAddress(userId, addressId);
+  return findAddressWithDelivery(userId, addressId);
 };
 
 const deleteAddress = async (userId, addressIdParam) => {

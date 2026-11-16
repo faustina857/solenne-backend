@@ -146,7 +146,7 @@ const updateProduct = async (id, changes) => {
 // Deleting means deactivating: past orders still point at the product.
 const deactivateProduct = (id) => updateProduct(id, { isActive: false });
 
-// Sets the stock to the number the admin sends (target-backend.md 12). Note: if an order
+// Sets the stock to the number the admin sends Note: if an order
 // reserved stock a second ago, the admin's number wins, so admins should send the real count.
 const setVariantStock = async (id, sku, stock) => {
   const product = await Product.findOneAndUpdate(

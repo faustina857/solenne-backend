@@ -147,6 +147,10 @@ const MESSAGES = Object.freeze({
   VARIANTS_DUPLICATE:
     'Each SKU, and each size and color combination, can only be used once per product.',
   VARIANT_NOT_FOUND: "We couldn't find that product or variant.",
+  ZONE_DEACTIVATED: 'Delivery zone deactivated.',
+  ZONE_EXISTS: 'This city is already set up. Its current details are shown.',
+  ZONE_CITY_TAKEN: (city) => `${city} is already set up in this state.`,
+  CITY_NOT_LISTED: 'Choose a city from the list.',
 });
 
 module.exports = { ERRORS, EMPTY, VALIDATION_MESSAGES, MESSAGES };

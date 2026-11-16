@@ -8,7 +8,8 @@
     "dev": "node --watch src/index.js",
     "lint": "eslint .",
     "seed:admin": "node src/seed/seedAdmin.js",
-    "seed:categories": "node src/seed/seedCategories.js"
+    "seed:categories": "node src/seed/seedCategories.js",
+    "seed:zones": "node src/seed/seedZones.js"
   },
   "keywords": [],
   "author": "",
