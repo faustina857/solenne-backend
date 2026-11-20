@@ -2,12 +2,10 @@ const Joi = require('joi');
 const {objectId} = require('../../middleware/validate');
 const { IMAGE_URL_MAX_LENGTH, IMAGE_PUBLIC_ID_MAX_LENGTH  } = require('../../constants');
 const { MESSAGES } = require('../../utils/messages');
-const CATEGORY_NAME_MIN_LENGTH = 2;
-const CATEGORY_NAME_MAX_LENGTH = 60;
+
 // Starts with a letter or digit (any language), then letters, digits, spaces and & ' . -
-const CATEGORY_NAME_PATTERN = /^[\p{L}\p{N}][\p{L}\p{N} '&.-]*$/u;
-const name = Joi.string().trim().min(CATEGORY_NAME_MIN_LENGTH)
-    .max(CATEGORY_NAME_MAX_LENGTH).pattern(CATEGORY_NAME_PATTERN)
+const name = Joi.string().trim().min(2)
+    .max(60).pattern( /^[\p{L}\p{N}][\p{L}\p{N} '&.-]*$/u )
     .messages({ 'string.pattern.base': MESSAGES.CATEGORY_NAME_INVALID });
 const SORT_ORDER_MAX = 9999;
 

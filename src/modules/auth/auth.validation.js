@@ -2,14 +2,13 @@ const Joi = require('joi');
 const { name, phone } = require('../users/users.validation');
 const { MESSAGES } = require('../../utils/messages');
 const { CODE_PATTERN } = require('../../constants');
-const PASSWORD_MIN_LENGTH = 8;
 const PASSWORD_MAX_LENGTH = 72;
 const email = Joi.string().trim().lowercase().email().required();
 
 // bcrypt only reads the first 72 BYTES, and emoji or accented letters use more than one byte,
 // so the limit is checked in bytes as well as characters. Passwords are never trimmed.
 const password = Joi.string()
-  .min(PASSWORD_MIN_LENGTH)
+  .min(2)
   .max(PASSWORD_MAX_LENGTH)
   .custom((value, helpers) =>
     Buffer.byteLength(value, 'utf8') > PASSWORD_MAX_LENGTH

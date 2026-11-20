@@ -6,8 +6,7 @@ const { ERRORS, EMPTY, MESSAGES } = require('../../utils/messages');
 const { getSkip } = require('../../utils/pagination');
 const { ROLES, GENDERS, PRODUCT_SORTS, LOW_STOCK_THRESHOLD } = require('../../constants');
 
-// Only this file uses these, so they live here.
-const DUPLICATE_KEY_ERROR_CODE = 11000;
+
 // men and women also see unisex products. unisex (or no gender) means no gender filter.
 const GENDER_MATCHES = Object.freeze({
   [GENDERS.MEN]: Object.freeze([GENDERS.MEN, GENDERS.UNISEX]),
@@ -90,7 +89,7 @@ const insertProduct = async (data) => {
   try {
     return await Product.create(data);
   } catch (error) {
-    if (error.code !== DUPLICATE_KEY_ERROR_CODE) throw error;
+    if (error.code !== 11000) throw error;
     // keyPattern names the index that clashed, so the message says what to change.
     const message = error.keyPattern?.slug ? MESSAGES.PRODUCT_NAME_TAKEN : MESSAGES.SKU_TAKEN;
     throw AppError.fromCode(ERRORS.CONFLICT, message);
@@ -281,11 +280,25 @@ const getProductFilters = async (query) => {
   };
 };
 
+// Public products for a list of ids, in the order given (the wishlist keeps the order saved).
+// Missing or deactivated products are left out.
+const getPublicProductsByIds = async (ids) => {
+  const products = await Product.find({ _id: { $in: ids }, isActive: true })
+    .populate(CATEGORY_POPULATE)
+    .lean();
+  const byId = new Map(products.map((product) => [product._id.toString(), product]));
+  return ids
+    .map((id) => byId.get(id.toString()))
+    .filter(Boolean)
+    .map(toPublicProduct);
+};
+
 module.exports = {
   createProduct,
   updateProduct,
   deactivateProduct,
   setVariantStock,
+  getPublicProductsByIds,
   getProductBySlug,
   listProducts,
   getProductFilters,

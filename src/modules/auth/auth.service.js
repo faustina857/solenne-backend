@@ -8,7 +8,6 @@ const { ERRORS, MESSAGES } = require('../../utils/messages');
 const { signToken } = require('../../utils/jwt');
 const mailer = require('../../utils/mailer');
 const { BCRYPT_COST, CODE_LENGTH, CODE_TTL_MS} = require('../../constants');
-const CODE_MAX_ATTEMPTS = 5;
 // These values are the names of the User fields that hold each kind of code.
 const CODE_PURPOSES = Object.freeze({
   EMAIL_VERIFICATION: 'emailVerification',
@@ -45,12 +44,12 @@ const issueCode = async (userId,purpose) =>{
 
 // Counts one attempt, but only while the code exists, hasn't expired and is under the limit.
 // It is one atomic write: MongoDB re-checks the filter on every write, so even 1000 parallel
-// guesses can't get more than CODE_MAX_ATTEMPTS tries.
+// guesses can't get more than 5 tries.
 const countAttempt = async (userId, purpose) => {
     const {matchedCount} = await User.updateOne(
         { _id: userId,
             [`${purpose}.expiresAt`]: { $gt: new Date() },
-            [`${purpose}.attempts`]: { $lt: CODE_MAX_ATTEMPTS },
+            [`${purpose}.attempts`]: { $lt: 5 },
         },
         { $inc: { [`${purpose}.attempts`]: 1 } },
     );

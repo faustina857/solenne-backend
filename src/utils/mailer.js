@@ -3,10 +3,7 @@ const logger = require('../config/logger');
 const { CODE_TTL_MINUTES} = require('../constants');
 
 const BREVO_SEND_URL = 'https://api.brevo.com/v3/smtp/email';
-const HTTP_TOO_MANY_REQUESTS = 429;
-const HTTP_SERVER_ERROR = 500;
 const EMAIL_REQUEST_TIMEOUT_MS = 10000
-const EMAIL_SEND_ATTEMPTS = 3;
 const EMAIL_RETRY_DELAY_MS = 1000;
 
 
@@ -39,7 +36,7 @@ const postEmail = async (body) => {
   const detail = await response.json().catch(() => ({}));
   const error = new Error(`Brevo ${response.status}: ${detail.message ?? 'no details'}`);
   error.retryable =
-    response.status === HTTP_TOO_MANY_REQUESTS || response.status >= HTTP_SERVER_ERROR;
+    response.status === 429|| response.status >= 500;
   throw error;
 };
 
@@ -54,7 +51,7 @@ const sendWithRetry = async ({ to, name, subject, html }) => {
     htmlContent: html,
   });
 
-  for (let attempt = 1; attempt <= EMAIL_SEND_ATTEMPTS; attempt += 1) {
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
     try {
       await postEmail(body);
       return;
@@ -62,7 +59,7 @@ const sendWithRetry = async ({ to, name, subject, html }) => {
       logger.warn({ attempt, subject, reason: err.message }, 'Email attempt failed');
       if (err.retryable === false) break;
     }
-    if (attempt < EMAIL_SEND_ATTEMPTS) await wait(EMAIL_RETRY_DELAY_MS * attempt);
+    if (attempt < 3) await wait(EMAIL_RETRY_DELAY_MS * attempt);
   }
   logger.error({ subject }, 'Email could not be sent');
 };

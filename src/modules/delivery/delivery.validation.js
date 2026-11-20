@@ -20,7 +20,7 @@ const cityName = Joi.string()
   .pattern(/^\p{L}[\p{L}\p{M}\s'.-]*$/u)
   .messages({ 'string.pattern.base': MESSAGES.LETTERS_ONLY });
 
-const fee = Joi.number().integer().min(0).max(100_000_000)
+const fee = Joi.number().integer().min(0).max(5_000_000); // kobo, so ₦50,000 at most
 const estimatedDays = Joi.string().trim().max(30);
 
 const createZoneBody = Joi.object({

@@ -15,7 +15,7 @@ const addressSchema = new mongoose.Schema(
     },
     phone: { 
         type: String, 
-        required: true, 
+        required: true,
         trim: true 
     },
     street: { 
@@ -82,6 +82,7 @@ const userSchema = new mongoose.Schema(
     },
     phone: { 
         type: String, 
+        unique: true,
         trim: true 
     },
     emailVerified: { 

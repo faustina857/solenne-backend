@@ -2,29 +2,23 @@ const Joi = require('joi');
 const { objectId } = require('../../middleware/validate');
 const { MESSAGES } = require('../../utils/messages');
 const { NIGERIAN_STATES} = require('../../constants');
-const NIGERIAN_PHONE_REGEX = /^(\+234|0)[789][01]\d{8}$/;
 
-const NAME_MIN_LENGTH = 2;
-const NAME_MAX_LENGTH = 80;
-const LABEL_MAX_LENGTH = 30;
-const TEXT_MAX_LENGTH = 120;
-const NAME_PATTERN = /^\p{L}[\p{L}\p{M}' .-]*$/u;
 // Shared with auth.validation.js (register uses the same name and phone rules).
 const name = Joi.string()
   .trim()
-  .min(NAME_MIN_LENGTH)
-  .max(NAME_MAX_LENGTH)
-  .pattern(NAME_PATTERN)
+  .min(2)
+  .max(80)
+  .pattern(/^\p{L}[\p{L}\p{M}' .-]*$/u)
   .messages({ 'string.pattern.base': MESSAGES.LETTERS_ONLY });
 const phone = Joi.string()
   .trim()
-  .pattern(NIGERIAN_PHONE_REGEX)
+  .pattern(/^(\+234|0)[789][01]\d{8}$/)
   .messages({ 'string.pattern.base': MESSAGES.PHONE_INVALID });
-const text = Joi.string().trim().max(TEXT_MAX_LENGTH);
+const text = Joi.string().trim().max(120);
 
 // Country is always Nigeria and is never accepted from the client (stripUnknown removes it).
 const addressBody = Joi.object({
-  label: Joi.string().trim().max(LABEL_MAX_LENGTH),
+  label: Joi.string().trim().max(30),
   fullName: name,
   phone,
   street: text,

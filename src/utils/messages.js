@@ -39,6 +39,8 @@ const ERRORS = defineErrors([
   ['OUT_OF_STOCK', 409, 'Sorry, that item just sold out.'],
   ['INSUFFICIENT_STOCK', 409, "There isn't enough stock for that quantity."],
   ['CART_HAS_ISSUES', 409, 'Some items in your cart changed. Please review them.'],
+  ['CART_FULL', 409, 'Your cart is full. Please remove an item before adding another.'],
+  ['WISHLIST_FULL', 409, 'Your wishlist is full. Please remove an item before adding another.'],
   ['PRICE_CHANGED', 409, 'The price of an item in your cart changed.'],
   ['AREA_NOT_DELIVERABLE', 400, "We don't deliver to this area yet."],
   ['CART_EMPTY', 400, 'Your cart is empty. Add something before checking out.'],
@@ -151,6 +153,16 @@ const MESSAGES = Object.freeze({
   ZONE_EXISTS: 'This city is already set up. Its current details are shown.',
   ZONE_CITY_TAKEN: (city) => `${city} is already set up in this state.`,
   CITY_NOT_LISTED: 'Choose a city from the list.',
+  ITEM_SOLD_OUT: (label) => `Sorry, ${label} just sold out.`,
+  ITEM_LOW_STOCK: (label, count) => `Only ${count} left in stock for ${label}.`,
+  CART_MAX_QUANTITY: (max) => `You can buy at most ${max} of one item at a time.`,
+  CART_ITEM_NOT_FOUND: "We couldn't find that item in your cart.",
+  CART_LOW_STOCK: (label, count) =>
+    `We reduced ${label} to ${count} because only ${count} ${count === 1 ? 'is' : 'are'} in stock.`,
+  CART_OUT_OF_STOCK: (label) => `${label} is sold out. Remove it or check back soon.`,
+  CART_UNAVAILABLE: (label) => `${label} is no longer available. Please remove it from your cart.`,
+  ITEM_IN_CART_LIMIT: (label, inCart, stock) =>
+    `You already have ${inCart} of ${label} in your cart, and only ${stock} ${stock === 1 ? 'is' : 'are'} in stock.`,
 });
 
 module.exports = { ERRORS, EMPTY, VALIDATION_MESSAGES, MESSAGES };

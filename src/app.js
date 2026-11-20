@@ -11,7 +11,8 @@ const usersRoutes = require('./modules/users/users.routes');
 const categoriesRoutes = require('./modules/categories/categories.routes');
 const productsRoutes = require('./modules/products/products.routes');
 const deliveryRoutes = require('./modules/delivery/delivery.routes')
-
+const cartRoutes = require('./modules/cart/cart.routes');
+const wishlistRoutes = require('./modules/wishlist/wishlist.routes');
 const JSON_BODY_LIMIT = '100kb';
 const API_PREFIX = '/api/solenne/v1';
 const HEALTH_PATH = `${API_PREFIX}/health`;
@@ -53,6 +54,8 @@ app.use(`${API_PREFIX}/users`, noStore, usersRoutes);
 app.use(`${API_PREFIX}/categories`, noStore, categoriesRoutes);
 app.use(`${API_PREFIX}/products`, noStore, productsRoutes);
 app.use(`${API_PREFIX}/delivery`, noStore, deliveryRoutes)
+app.use(`${API_PREFIX}/cart`, noStore, cartRoutes);
+app.use(`${API_PREFIX}/wishlist`, noStore, wishlistRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
